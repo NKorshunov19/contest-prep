@@ -6,13 +6,6 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 
-/**
- * Обходы графа. Обе реализации итеративные — на контесте граф может быть цепочкой
- * из 10^5 вершин, и рекурсивный DFS упадёт со StackOverflowError.
- *
- * Граф задаётся списками смежности: List&lt;List&lt;Integer&gt;&gt;.
- * Матрица смежности на 10^5 вершин потребовала бы 10^10 ячеек — не вариант.
- */
 public final class Graphs {
 
     private Graphs() {
@@ -31,11 +24,6 @@ public final class Graphs {
         graph.get(to).add(from);
     }
 
-    /**
-     * Кратчайшие расстояния в рёбрах от стартовой вершины (поиск в ширину).
-     * Работает только для невзвешенного графа: если у рёбер есть веса, нужен Дейкстра.
-     * Недостижимые вершины остаются с -1.
-     */
     public static int[] bfsDistances(List<List<Integer>> graph, int start) {
         if (start < 0 || start >= graph.size()) {
             throw new IllegalArgumentException(
@@ -59,10 +47,6 @@ public final class Graphs {
         return distance;
     }
 
-    /**
-     * Номер компоненты связности для каждой вершины и их общее количество.
-     * Обход в глубину на явном стеке.
-     */
     public static int[] connectedComponents(List<List<Integer>> graph) {
         int[] component = new int[graph.size()];
         Arrays.fill(component, -1);

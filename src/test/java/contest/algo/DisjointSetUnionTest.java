@@ -20,7 +20,7 @@ class DisjointSetUnionTest {
     }
 
     @Test
-    @DisplayName("объединение транзитивно: 0-1 и 1-2 делают 0 и 2 связанными")
+    @DisplayName("объединение транзитивно")
     void unionIsTransitive() {
         DisjointSetUnion dsu = new DisjointSetUnion(5);
 
@@ -32,7 +32,7 @@ class DisjointSetUnionTest {
     }
 
     @Test
-    @DisplayName("повторное объединение уже связанных возвращает false и не меняет счётчик")
+    @DisplayName("повторное объединение уже связанных ничего не меняет")
     void repeatedUnionChangesNothing() {
         DisjointSetUnion dsu = new DisjointSetUnion(3);
         assertThat(dsu.union(0, 1)).isTrue();
@@ -43,7 +43,7 @@ class DisjointSetUnionTest {
     }
 
     @Test
-    @DisplayName("длинная цепочка не переполняет стек — find итеративный")
+    @DisplayName("длинная цепочка не переполняет стек")
     void longChainDoesNotOverflowStack() {
         int size = 200_000;
         DisjointSetUnion dsu = new DisjointSetUnion(size);
@@ -70,7 +70,7 @@ class DisjointSetUnionTest {
     }
 
     @Test
-    @DisplayName("элемент вне диапазона — понятное исключение")
+    @DisplayName("элемент вне диапазона отвергается")
     void rejectsElementOutOfRange() {
         DisjointSetUnion dsu = new DisjointSetUnion(3);
 

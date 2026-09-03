@@ -30,10 +30,9 @@ class GraphsTest {
     }
 
     @Test
-    @DisplayName("BFS находит кратчайший путь, а не первый попавшийся")
+    @DisplayName("BFS находит кратчайший путь")
     void bfsFindsShortestNotFirst() {
         List<List<Integer>> graph = Graphs.newGraph(5);
-        // Длинный обход 0-1-2-3-4 и короткая перемычка 0-4
         Graphs.addEdge(graph, 0, 1);
         Graphs.addEdge(graph, 1, 2);
         Graphs.addEdge(graph, 2, 3);
@@ -50,7 +49,6 @@ class GraphsTest {
         Graphs.addEdge(graph, 0, 1);
         Graphs.addEdge(graph, 1, 2);
         Graphs.addEdge(graph, 3, 4);
-        // вершины 5 и 6 изолированы
 
         assertThat(Graphs.countComponents(graph)).isEqualTo(4);
     }
@@ -68,7 +66,7 @@ class GraphsTest {
     }
 
     @Test
-    @DisplayName("граф без вершин: компонент ноль, обход невозможен")
+    @DisplayName("граф без вершин")
     void emptyGraph() {
         List<List<Integer>> graph = Graphs.newGraph(0);
 
@@ -86,7 +84,7 @@ class GraphsTest {
     }
 
     @Test
-    @DisplayName("петли и кратные рёбра не ломают обход")
+    @DisplayName("петли и кратные рёбра")
     void loopsAndParallelEdgesAreHarmless() {
         List<List<Integer>> graph = Graphs.newGraph(3);
         Graphs.addEdge(graph, 0, 0);
@@ -101,7 +99,7 @@ class GraphsTest {
     }
 
     @Test
-    @DisplayName("1-индексация из ввода: вершина 0 остаётся лишней компонентой")
+    @DisplayName("при 1-индексации вершина 0 остаётся лишней компонентой")
     void oneBasedInputLeavesVertexZeroSeparate() {
         List<List<Integer>> graph = Graphs.newGraph(4 + 1);
         Graphs.addEdge(graph, 1, 2);

@@ -73,7 +73,7 @@ class MinFreeNumberTest {
     }
 
     @Test
-    @DisplayName("повторное освобождение отвергается, иначе номер выдался бы дважды")
+    @DisplayName("повторное освобождение отвергается")
     void rejectsDoubleRelease() {
         MinFreeNumber pool = new MinFreeNumber(1);
         pool.acquire();
@@ -87,7 +87,7 @@ class MinFreeNumberTest {
     }
 
     @Test
-    @DisplayName("занятый номер можно освободить и занять снова")
+    @DisplayName("номер можно освободить и занять снова")
     void numberCanBeReleasedAgainAfterReacquire() {
         MinFreeNumber pool = new MinFreeNumber(1);
         pool.acquire();

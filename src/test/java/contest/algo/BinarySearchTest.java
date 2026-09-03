@@ -35,7 +35,7 @@ class BinarySearchTest {
     }
 
     @Test
-    @DisplayName("не переполняется на границах близких к Integer.MAX_VALUE")
+    @DisplayName("не переполняется у Integer.MAX_VALUE")
     void doesNotOverflowNearMaxValue() {
         int target = Integer.MAX_VALUE - 10;
 
@@ -86,7 +86,7 @@ class BinarySearchTest {
     }
 
     @Test
-    @DisplayName("перевёрнутый диапазон отвергается, а не отдаёт молча lo")
+    @DisplayName("перевёрнутый диапазон отвергается")
     void reversedRangeIsRejected() {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> BinarySearch.firstTrue(5, 3, x -> true));
@@ -108,7 +108,7 @@ class BinarySearchTest {
 
     @Test
     @Timeout(10)
-    @DisplayName("вещественный поиск на широком отрезке не зависает")
+    @DisplayName("вещественный поиск на широком отрезке")
     void doubleSearchTerminatesOnWideRange() {
         double root = BinarySearch.firstTrueDouble(0, 1e18, x -> x * x >= 1e18);
 

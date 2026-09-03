@@ -22,11 +22,10 @@ public class Main {
         }
         out.println(sum);
 
-        // без flush вывод останется в буфере и проверяющий увидит пустой ответ
+        // без flush ответ останется в буфере и проверяющий увидит пустоту
         out.flush();
     }
 
-    // токены берутся построчно, чтобы не зависеть от того, как разбит ввод
     private static String next() throws IOException {
         while (!tokenizer.hasMoreTokens()) {
             String line = in.readLine();

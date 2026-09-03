@@ -33,7 +33,6 @@ class ExpressionEvaluatorTest {
     @Test
     @DisplayName("вычитание слева направо, а не справа налево")
     void subtractionIsLeftAssociative() {
-        // Классическая ошибка наивного парсера: он посчитает 10-(3-2)=9
         assertThat(ExpressionEvaluator.evaluate("10-3-2")).contains(5L);
     }
 
@@ -47,15 +46,14 @@ class ExpressionEvaluatorTest {
     @ValueSource(strings = {
             "2+", "+", "", "2++2", "(2+3", "2+3)", "()", "2 3", "abc", "2/3", "((2)"
     })
-    @DisplayName("некорректный ввод даёт пустой результат, а не исключение наружу")
+    @DisplayName("некорректный ввод даёт пустой результат")
     void rejectsMalformedInput(String expression) {
         assertThat(ExpressionEvaluator.evaluate(expression)).isEmpty();
     }
 
     @Test
-    @DisplayName("переполнение long ловится, а не заворачивается по кругу")
+    @DisplayName("переполнение long ловится")
     void detectsOverflow() {
-        // Обычное умножение молча дало бы отрицательное число
         assertThat(ExpressionEvaluator.evaluate("9223372036854775807*2")).isEmpty();
         assertThat(ExpressionEvaluator.evaluate("9223372036854775807+1")).isEmpty();
         assertThat(ExpressionEvaluator.evaluate("99999999999999999999")).isEmpty();
@@ -68,7 +66,7 @@ class ExpressionEvaluatorTest {
     }
 
     @Test
-    @DisplayName("null не роняет вычислитель")
+    @DisplayName("null допустим")
     void nullIsHandled() {
         assertThat(ExpressionEvaluator.evaluate(null)).isEmpty();
     }
@@ -103,7 +101,7 @@ class ExpressionEvaluatorTest {
 
     @Test
     @Timeout(10)
-    @DisplayName("вложенность за пределом отвергается, а не роняет стек")
+    @DisplayName("слишком глубокая вложенность отвергается")
     void tooDeepNestingIsRejected() {
         String parentheses = "(".repeat(100_000) + "1" + ")".repeat(100_000);
         String minuses = "-".repeat(100_000) + "1";

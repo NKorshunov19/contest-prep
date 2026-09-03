@@ -5,19 +5,6 @@ import java.io.InputStream;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
-/**
- * Быстрое чтение чисел из стандартного потока.
- *
- * Зачем это нужно на контесте: Scanner разбирает вход регулярными выражениями и на
- * 10^5–10^6 числах легко съедает секунду-две из лимита. Этот вариант читает байты
- * блоками по 64 КБ и собирает числа вручную — на порядок быстрее.
- *
- * На маленьком вводе (до пары тысяч чисел) разницы нет, можно брать Scanner.
- * Но если в условии N до 10^5 и больше — берите этот.
- *
- * Исключения как у java.util.Scanner: NoSuchElementException, когда ввод кончился,
- * InputMismatchException, когда прочитанное не похоже на число или не влезает в тип.
- */
 public class FastScanner implements AutoCloseable {
 
     private static final int BUFFER_SIZE = 1 << 16;
@@ -63,7 +50,7 @@ public class FastScanner implements AutoCloseable {
         try {
             while (b >= '0' && b <= '9') {
                 read();
-                // копим отрицательное: положительное не вместило бы Long.MIN_VALUE
+                // копим отрицательное, иначе Long.MIN_VALUE не влезет
                 result = Math.subtractExact(Math.multiplyExact(result, 10), b - '0');
                 b = peek();
             }
@@ -87,10 +74,6 @@ public class FastScanner implements AutoCloseable {
         return sb.toString();
     }
 
-    /**
-     * Остаток текущей строки, как у java.util.Scanner: сразу после nextInt это пустая
-     * строка, потому что число остановилось перед переводом строки, а не за ним.
-     */
     public String nextLine() throws IOException {
         int b = read();
         if (b == -1) {
@@ -129,7 +112,7 @@ public class FastScanner implements AutoCloseable {
         return buffer[bufferPointer] & 0xFF;
     }
 
-    /** false, если ввод кончился. Флаг eof обязателен: без него после -1 буфер читался бы заново. */
+    // без флага eof буфер после конца потока отдавал бы старые байты
     private boolean fill() throws IOException {
         if (eof) {
             return false;

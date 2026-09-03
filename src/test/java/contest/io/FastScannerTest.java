@@ -51,7 +51,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("число за границей long отвергается, а не заворачивается")
+    @DisplayName("число за границей long отвергается")
     void rejectsNumberOutOfLongRange() {
         FastScanner in = scanner("9223372036854775808");
 
@@ -59,7 +59,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("число за границей int отвергается, а не обрезается")
+    @DisplayName("число за границей int отвергается")
     void rejectsNumberOutOfIntRange() {
         FastScanner in = scanner("3000000000");
 
@@ -67,7 +67,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("после конца ввода бросает, а не отдаёт мусор из буфера")
+    @DisplayName("после конца ввода бросает исключение")
     void throwsAfterEndOfInput() throws IOException {
         FastScanner in = scanner("42");
         assertThat(in.nextInt()).isEqualTo(42);
@@ -97,7 +97,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("не число вместо числа — исключение, а не ноль")
+    @DisplayName("не число вместо числа — исключение")
     void rejectsNonNumericToken() {
         assertThatExceptionOfType(InputMismatchException.class)
                 .isThrownBy(() -> scanner("abc").nextLong());
@@ -147,7 +147,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("число длиннее буфера тоже собирается по кускам")
+    @DisplayName("числа на границе буфера собираются по кускам")
     void readsNumbersAcrossBufferBoundary() throws IOException {
         StringBuilder input = new StringBuilder();
         for (int i = 0; i < 50_000; i++) {
@@ -164,7 +164,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("nextLine после nextInt отдаёт остаток строки, а не следующую")
+    @DisplayName("nextLine отдаёт остаток текущей строки")
     void nextLineReturnsRestOfCurrentLine() throws IOException {
         FastScanner in = scanner("5 tail of line\nsecond line\n");
 
@@ -184,7 +184,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("пустые строки не пропускаются, а \\r\\n не даёт лишней строки")
+    @DisplayName("пустые строки сохраняются, \\r\\n не даёт лишней")
     void keepsEmptyLinesAndHandlesCarriageReturn() throws IOException {
         FastScanner in = scanner("first\r\n\r\nthird\r\n");
 
@@ -203,7 +203,7 @@ class FastScannerTest {
     }
 
     @Test
-    @DisplayName("миллион чисел читается за секунды")
+    @DisplayName("миллион чисел читается быстро")
     void readsMillionNumbersQuickly() throws IOException {
         StringBuilder input = new StringBuilder();
         for (int i = 0; i < 1_000_000; i++) {

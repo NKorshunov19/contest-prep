@@ -2,27 +2,6 @@ package contest.algo;
 
 import java.util.Optional;
 
-/**
- * Калькулятор целочисленных выражений со скобками: + - * ( ) и унарный минус.
- *
- * Это задача с реального вступительного экзамена Т-Банка. Разбор — методом
- * рекурсивного спуска: грамматика записывается напрямую в виде трёх методов,
- * и приоритет операций получается сам собой из того, кто кого вызывает.
- *
- *   выражение := слагаемое (('+' | '-') слагаемое)*
- *   слагаемое := множитель ('*' множитель)*
- *   множитель := число | '(' выражение ')' | '-' множитель
- *
- * Умножение «сильнее» сложения именно потому, что слагаемое состоит из множителей,
- * а не наоборот. Никаких таблиц приоритетов не нужно.
- *
- * Глубина вложенности скобок ограничена MAX_DEPTH: разбор рекурсивный, и без предела
- * вход из 10^5 открывающих скобок дал бы StackOverflowError вместо честного отказа.
- *
- * Переполнение ловится через Math.addExact / multiplyExact: они бросают
- * ArithmeticException вместо тихого заворачивания по кругу, как обычные + и *.
- * Возвращаем Optional.empty() на любой некорректный вход — вызывающий печатает WRONG.
- */
 public final class ExpressionEvaluator {
 
     private static final int MAX_DEPTH = 1000;
@@ -43,7 +22,6 @@ public final class ExpressionEvaluator {
         try {
             long value = parser.parseExpression();
             parser.skipSpaces();
-            // Разобрали префикс, но что-то осталось — например "2+2)" — это ошибка.
             if (parser.position != expression.length()) {
                 return Optional.empty();
             }
@@ -105,10 +83,7 @@ public final class ExpressionEvaluator {
         }
     }
 
-    /**
-     * Минус разбирается вместе с цифрами, а не как отдельная операция: иначе
-     * -9223372036854775808 сначала попытался бы стать положительным и не влез бы в long.
-     */
+    // минус разбираю вместе с цифрами: иначе -9223372036854775808 не влезет в long
     private long parseNumber(boolean negative) {
         skipSpaces();
         int start = position;
@@ -120,7 +95,6 @@ public final class ExpressionEvaluator {
         }
         String digits = input.substring(start, position);
         try {
-            // parseLong сам бросит исключение, если число не влезает в 64 бита.
             return Long.parseLong(negative ? "-" + digits : digits);
         } catch (NumberFormatException e) {
             throw new ArithmeticException("число вне диапазона long");
