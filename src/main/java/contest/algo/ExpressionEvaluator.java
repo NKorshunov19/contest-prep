@@ -16,14 +16,20 @@ import java.util.Optional;
  * Умножение «сильнее» сложения именно потому, что слагаемое состоит из множителей,
  * а не наоборот. Никаких таблиц приоритетов не нужно.
  *
+ * Глубина вложенности скобок ограничена MAX_DEPTH: разбор рекурсивный, и без предела
+ * вход из 10^5 открывающих скобок дал бы StackOverflowError вместо честного отказа.
+ *
  * Переполнение ловится через Math.addExact / multiplyExact: они бросают
  * ArithmeticException вместо тихого заворачивания по кругу, как обычные + и *.
  * Возвращаем Optional.empty() на любой некорректный вход — вызывающий печатает WRONG.
  */
 public final class ExpressionEvaluator {
 
+    private static final int MAX_DEPTH = 1000;
+
     private final String input;
     private int position;
+    private int depth;
 
     private ExpressionEvaluator(String input) {
         this.input = input;
@@ -74,22 +80,36 @@ public final class ExpressionEvaluator {
     }
 
     private long parseFactor() {
-        skipSpaces();
-        if (consumeIf('-')) {
-            return Math.negateExact(parseFactor());
+        if (++depth > MAX_DEPTH) {
+            throw new IllegalStateException("слишком глубокая вложенность: " + depth);
         }
-        if (consumeIf('(')) {
-            long inner = parseExpression();
+        try {
             skipSpaces();
-            if (!consumeIf(')')) {
-                throw new IllegalStateException("нет закрывающей скобки");
+            if (consumeIf('-')) {
+                if (position < input.length() && Character.isDigit(input.charAt(position))) {
+                    return parseNumber(true);
+                }
+                return Math.negateExact(parseFactor());
             }
-            return inner;
+            if (consumeIf('(')) {
+                long inner = parseExpression();
+                skipSpaces();
+                if (!consumeIf(')')) {
+                    throw new IllegalStateException("нет закрывающей скобки");
+                }
+                return inner;
+            }
+            return parseNumber(false);
+        } finally {
+            depth--;
         }
-        return parseNumber();
     }
 
-    private long parseNumber() {
+    /**
+     * Минус разбирается вместе с цифрами, а не как отдельная операция: иначе
+     * -9223372036854775808 сначала попытался бы стать положительным и не влез бы в long.
+     */
+    private long parseNumber(boolean negative) {
         skipSpaces();
         int start = position;
         while (position < input.length() && Character.isDigit(input.charAt(position))) {
@@ -98,9 +118,10 @@ public final class ExpressionEvaluator {
         if (start == position) {
             throw new IllegalStateException("ожидалось число на позиции " + position);
         }
+        String digits = input.substring(start, position);
         try {
             // parseLong сам бросит исключение, если число не влезает в 64 бита.
-            return Long.parseLong(input, start, position, 10);
+            return Long.parseLong(negative ? "-" + digits : digits);
         } catch (NumberFormatException e) {
             throw new ArithmeticException("число вне диапазона long");
         }
@@ -116,7 +137,7 @@ public final class ExpressionEvaluator {
     }
 
     private void skipSpaces() {
-        while (position < input.length() && input.charAt(position) == ' ') {
+        while (position < input.length() && Character.isWhitespace(input.charAt(position))) {
             position++;
         }
     }

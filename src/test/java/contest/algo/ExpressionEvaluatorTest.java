@@ -2,6 +2,7 @@ package contest.algo;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -71,4 +72,50 @@ class ExpressionEvaluatorTest {
     void nullIsHandled() {
         assertThat(ExpressionEvaluator.evaluate(null)).isEmpty();
     }
+
+    @ParameterizedTest(name = "{0} = {1}")
+    @CsvSource({
+            "'--3', 3",
+            "'---3', -3",
+            "'-(1+2)', -3",
+            "'2*-(3+1)', -8",
+            "'-2*-2', 4",
+            "'10--5', 15"
+    })
+    @DisplayName("унарный минус можно ставить подряд")
+    void handlesRepeatedUnaryMinus(String expression, long expected) {
+        assertThat(ExpressionEvaluator.evaluate(expression)).contains(expected);
+    }
+
+    @Test
+    @DisplayName("табуляции и переводы строк считаются пробелами")
+    void tabsAndNewlinesAreWhitespace() {
+        assertThat(ExpressionEvaluator.evaluate("2\t+\n3 * 4")).contains(14L);
+    }
+
+    @Test
+    @DisplayName("умеренная вложенность скобок считается")
+    void moderateNestingIsEvaluated() {
+        String expression = "(".repeat(300) + "1+1" + ")".repeat(300);
+
+        assertThat(ExpressionEvaluator.evaluate(expression)).contains(2L);
+    }
+
+    @Test
+    @Timeout(10)
+    @DisplayName("вложенность за пределом отвергается, а не роняет стек")
+    void tooDeepNestingIsRejected() {
+        String parentheses = "(".repeat(100_000) + "1" + ")".repeat(100_000);
+        String minuses = "-".repeat(100_000) + "1";
+
+        assertThat(ExpressionEvaluator.evaluate(parentheses)).isEmpty();
+        assertThat(ExpressionEvaluator.evaluate(minuses)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Long.MIN_VALUE получается через унарный минус")
+    void reachesLongMinValue() {
+        assertThat(ExpressionEvaluator.evaluate("-9223372036854775808")).contains(Long.MIN_VALUE);
+    }
+
 }

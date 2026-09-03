@@ -22,6 +22,9 @@ public class DisjointSetUnion {
     private int componentCount;
 
     public DisjointSetUnion(int size) {
+        if (size < 0) {
+            throw new IllegalArgumentException("размер не может быть отрицательным: " + size);
+        }
         parent = new int[size];
         rank = new int[size];
         componentCount = size;
@@ -35,6 +38,10 @@ public class DisjointSetUnion {
      * в 10^5 элементов даёт StackOverflowError, а на контесте стек не увеличить.
      */
     public int find(int x) {
+        if (x < 0 || x >= parent.length) {
+            throw new IndexOutOfBoundsException(
+                    "элемент " + x + " вне диапазона 0.." + (parent.length - 1));
+        }
         int root = x;
         while (parent[root] != root) {
             root = parent[root];

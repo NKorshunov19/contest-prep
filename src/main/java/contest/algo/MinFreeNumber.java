@@ -1,7 +1,7 @@
 package contest.algo;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 /**
  * Выдача наименьшего свободного номера с возвратом — «полки», «столики», «пул id».
@@ -13,31 +13,36 @@ import java.util.Queue;
  * Если в куче что-то есть — берём минимум оттуда, иначе выдаём следующий новый.
  * Это O(log n) на операцию против O(n) у наивного перебора «ищу первый свободный».
  *
- * Куча, а не TreeSet: номера в куче не повторяются по построению, а PriorityQueue
- * экономнее по памяти и константе. Если бы нужны были ещё и запросы «есть ли номер X»
- * или «следующий больший», тогда брали бы TreeSet.
+ * TreeSet, а не куча: он и отдаёт минимум за O(log n), и сам ловит повторное
+ * освобождение одного номера — куча пропустила бы дубликат и выдала номер дважды.
  */
 public class MinFreeNumber {
 
-    private final Queue<Integer> released = new PriorityQueue<>();
+    private final NavigableSet<Integer> released = new TreeSet<>();
+    private final int firstNumber;
     private int nextFresh;
 
     public MinFreeNumber(int firstNumber) {
+        this.firstNumber = firstNumber;
         this.nextFresh = firstNumber;
     }
 
     /** Занимает и возвращает наименьший свободный номер. */
     public int acquire() {
-        Integer reused = released.poll();
+        Integer reused = released.pollFirst();
         return reused != null ? reused : nextFresh++;
     }
 
     /**
-     * Возвращает номер в пул.
-     * Повторное освобождение того же номера здесь не проверяется — на контесте
-     * этого обычно не требуют, но в проде это была бы дыра.
+     * Возвращает номер в пул. Номер, который не выдавался или уже свободен, — ошибка
+     * в вызывающем коде: тихо проглотив её, мы выдали бы один номер двум владельцам.
      */
     public void release(int number) {
-        released.add(number);
+        if (number < firstNumber || number >= nextFresh) {
+            throw new IllegalArgumentException("номер " + number + " не выдавался");
+        }
+        if (!released.add(number)) {
+            throw new IllegalStateException("номер " + number + " уже свободен");
+        }
     }
 }

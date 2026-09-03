@@ -37,6 +37,10 @@ public final class Graphs {
      * Недостижимые вершины остаются с -1.
      */
     public static int[] bfsDistances(List<List<Integer>> graph, int start) {
+        if (start < 0 || start >= graph.size()) {
+            throw new IllegalArgumentException(
+                    "вершина " + start + " вне графа из " + graph.size() + " вершин");
+        }
         int[] distance = new int[graph.size()];
         Arrays.fill(distance, -1);
         distance[start] = 0;
